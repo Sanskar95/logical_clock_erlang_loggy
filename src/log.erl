@@ -20,11 +20,11 @@ stop(Logger) ->
 init(Nodes) ->
   loop(time:clock(Nodes), []).
 
-loop(Clock, HoldBackQ) ->
+loop(Clock, Queue) ->
   receive
     {log, From, Time, Msg} ->
       UpdatedClock = time:update(From, Time, Clock),
-      SortedQueue = lists:keysort(2, [{From, Time, Msg} | HoldBackQ]),
+      SortedQueue = lists:keysort(2, [{From, Time, Msg} | Queue]),
       InvalidMessageQueue = iterateAndValidate(SortedQueue, UpdatedClock, []),
       loop(UpdatedClock, InvalidMessageQueue);
     stop ->

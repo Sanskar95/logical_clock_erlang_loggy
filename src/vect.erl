@@ -31,8 +31,51 @@ merge([{Name, Ti} | Rest], Time) ->
       [{Name, Ti} | merge(Rest, Time)]
   end.
 
+leq([], _) ->
+  true;
+leq([{Name, Ti} | Rest], Time) ->
+  case lists:keyfind(Name, 1, Time) of
+    {Name, Tj} ->
+      if
+        Ti =< Tj ->
+          true;
+        true ->
+          false
 
+      end;
+    false ->
 
+      leq(Rest, Time)
+  end.
 
+clock(Nodes) ->
+  lists:foldl(fun(Node, Acc) -> [{Node, zero()} | Acc] end, [], Nodes).
+
+update(From, Time, Clock) ->
+  {_Name, Tj} = lists:keyfind(From, 1, Time),
+  case lists:keyfind(From, 1, Clock) of
+    {From, _} ->
+      lists:keyreplace(From, 1, Clock, {From, Time});
+    false ->
+      [{From, Time} | Clock]
+  end.
+
+safe(Time, Clock) ->
+  SafeFlagList = [],
+  lists:foreach(fun({Name, Ti}) ->
+    case lists:keyfind(Name, 1, Clock) of
+      {Name, TimeInClock} ->
+        lists:append(leq(Time, TimeInClock), SafeFlagList);
+      false ->
+        lists:append(true, SafeFlagList)
+    end
+                end, Time),
+
+  case length(SafeFlagList) == length(Time) of
+    true ->
+      true;
+    false ->
+      false
+  end.
 %% API
--export([]).
+-export([safe/2, update/3, clock/1, inc/2, zero/0, merge/2]).
