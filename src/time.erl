@@ -6,7 +6,6 @@
 %%% @end
 %%% Created : 24. Sep 2020 01:18
 %%%-------------------------------------------------------------------
--author("Sanskar95").
 -module(time).
 -export([zero/0, inc/2, merge/2, leq/2, clock/1, update/3, safe/2]).
 
